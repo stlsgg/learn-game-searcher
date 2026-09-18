@@ -5,7 +5,7 @@ stored information in the database. that's all.
 ## nodes to practice
 this is simple yet project for learning purposes.
 learning goals:
-- strenghthen python language skills
+- strengthen python language skills
 - asyncio
 - fast api
 - postgresql (introduction to this dbms) + pgvector + asyncpg
