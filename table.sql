@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TYPE schedule_type AS ENUM ('lecture', 'practice');
 
 CREATE TABLE IF NOT EXISTS schedule (
@@ -8,3 +10,8 @@ CREATE TABLE IF NOT EXISTS schedule (
     cabinet INT NOT NULL,
     type schedule_type NOT NULL
 );
+
+-- add a vector columns
+
+ALTER TABLE schedule
+ADD COLUMN IF NOT EXISTS embedding vector(2048);
