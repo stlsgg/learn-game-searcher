@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from objects import Question
 
 app = FastAPI()
 
@@ -10,6 +11,6 @@ async def healthcheck():
 
 
 @app.post("/ask")
-async def ask_ai():
+async def ask_ai(question: Question):
     """ask ai agent question, related to the app data."""
-    return { "status": "WIP" }
+    return question
