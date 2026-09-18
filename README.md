@@ -2,6 +2,9 @@
 this app use ai powers for making embeddings and answer user questions about
 stored information in the database. that's all.
 
+## core idea of the app
+![main flow of user interaction with app](./idea.svg)
+
 ## nodes to practice
 this is simple yet project for learning purposes.
 learning goals:
