@@ -1,3 +1,4 @@
+from config import *
 from fastapi import FastAPI
 from objects import Question
 
