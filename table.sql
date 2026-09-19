@@ -1,17 +1,14 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
-CREATE TYPE schedule_type AS ENUM ('lecture', 'practice');
-
-CREATE TABLE IF NOT EXISTS schedule (
+CREATE TABLE IF NOT EXISTS game (
     id SERIAL PRIMARY KEY,
-    subject_name VARCHAR(255) NOT NULL,
-    starting_at TIMESTAMP NOT NULL,
-    teacher VARCHAR(255) NOT NULL,
-    cabinet INT NOT NULL,
-    type schedule_type NOT NULL
+    name VARCHAR(255) NOT NULL UNIQUE,
+    price NUMERIC(10,2) NOT NULL,
+    description TEXT,
+    genre TEXT,
+    categories TEXT,
+    hardware_requirements TEXT,
+    released_at TIMESTAMPTZ NOT NULL,
+
+    embedding VECTOR(2000)
 );
-
--- add a vector columns
-
-ALTER TABLE schedule
-ADD COLUMN IF NOT EXISTS embedding vector(2048);
