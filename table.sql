@@ -12,3 +12,7 @@ CREATE TABLE IF NOT EXISTS game (
 
     embedding VECTOR(2000)
 );
+
+ALTER TABLE game
+ALTER COLUMN embedding TYPE vector(2048)
+USING embedding::vector(2048);
