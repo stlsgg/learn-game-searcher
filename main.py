@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request
 from objects import Question
 import asyncpg
 from contextlib import asynccontextmanager
+from helper import semantic_search
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -126,3 +127,11 @@ async def ask_ai(question: Question):
     print(f"usage:\ninput tokens {res.usage.input_tokens},\noutput tokens \
           {res.usage.output_tokens}\ntotal tokens {res.usage.total_tokens}")
     return res.output_text
+
+
+@app.post("/description")
+async def search_by_description(question: Question, request: Request):
+    """show related games by given user explaining"""
+    pool: asyncpg.Pool = request.app.state.pool
+    rows = await semantic_search(question.text, pool, ai)
+    return rows
