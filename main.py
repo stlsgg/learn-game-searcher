@@ -1,9 +1,25 @@
 from config import *
 from openai import OpenAI
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from objects import Question
+import asyncpg
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    pool = await asyncpg.create_pool(
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME,
+        host=DB_ADDR,
+        min_size=5,
+        max_size=20,
+    )
+    app.state.pool = pool
+    yield
+    await pool.close()
+
+app = FastAPI(lifespan=lifespan)
 ai = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 SYSTEM_PROMPT = """
 youre helpful assistant. answer to user question shortly (up to three
@@ -14,6 +30,18 @@ sentences).
 async def healthcheck():
     """simple http server live check."""
     return { "status": "ok" }
+
+
+@app.get("/db")
+async def database_healthcheck(request: Request):
+    """test db connection."""
+    pool: asyncpg.Pool = request.app.state.pool
+    async with pool.acquire() as conn:
+        try:
+            await conn.fetch("SELECT 1")
+            return { "status": "ok" }
+        except asyncpg.exceptions.PostgresError as err:
+            return { "status": "error", "message": err }
 
 
 @app.get("/game")
