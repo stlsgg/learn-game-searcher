@@ -148,5 +148,5 @@ async def ask_ai(question: Question):
 async def search_by_description(question: Question, request: Request):
     """show related games by given user explaining"""
     pool: asyncpg.Pool = request.app.state.pool
-    rows = await semantic_search(question.text, pool, ai)
+    rows = await semantic_search(question.text, pool)
     return rows
