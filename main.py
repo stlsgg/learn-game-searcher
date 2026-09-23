@@ -1,7 +1,8 @@
 from config import *
+from typing import Annotated
 from openai import OpenAI
-from fastapi import FastAPI, Request
-from objects import Question
+from fastapi import FastAPI, Request, Query
+from objects import Question, FilterParams
 import asyncpg
 from contextlib import asynccontextmanager
 from helper import semantic_search
@@ -46,8 +47,9 @@ async def database_healthcheck(request: Request):
 
 
 @app.get("/game")
-async def get_game():
+async def get_game(filter_query: Annotated[FilterParams, Query()]):
     """retrieve games from library."""
+    return filter_query or {}
     # TODO route accept query filters: /game?query_filters
     # TODO add query filters: limit, offset, genre, category, release_before,
     # release_after, price
