@@ -1,10 +1,17 @@
+import asyncio
 from config import *
 from openai import OpenAI
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from objects import Question
 import asyncpg
 from contextlib import asynccontextmanager
 from helper import semantic_search
+from pgvector.asyncpg import register_vector
+from embedding import embed, make_embedding
+
+# pgvector initialization
+async def init(conn):
+    await register_vector(conn)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,6 +22,7 @@ async def lifespan(app: FastAPI):
         host=DB_ADDR,
         min_size=5,
         max_size=20,
+        init=init,
     )
     app.state.pool = pool
     yield
@@ -86,13 +94,20 @@ async def delete_game():
     return {}
 
 
-@app.post("/game/{id}/embed")
-async def create_embedding():
+@app.post("/game/{id}/embed", status_code=status.HTTP_202_ACCEPTED)
+async def create_embedding(id: int, request: Request):
     """process game info into vectors and save it to game data."""
-    # TODO return immediately to user, return 202 accepted
-    # NOTE: process must go away from fastapi and should be handled in the
-    # background
-    return {}
+    pool: asyncpg.Pool = request.app.state.pool
+    async with pool.acquire() as conn:
+        exists = await conn.fetchval("select 1 from game where id = $1", id)
+        if not exists:
+            raise HTTPException(
+                status_code=status.HTTP_404_BAD_REQUEST,
+                detail={"status": "error", "message": "game doesnt exist"}
+            )
+
+    asyncio.create_task(make_embedding(id, pool))
+    return { "status": "ok", "message": "embedding started" }
 
 # general TODO:
 # TODO custom error handler for all wrong dto:

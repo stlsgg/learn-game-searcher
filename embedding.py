@@ -13,43 +13,36 @@ import asyncio
 import asyncpg
 from openai import OpenAI
 from config import *
+from pgvector import Vector
 
-async def main():
+
+async def embed(text: str):
+    """
+    take string and convert to embedding data with ai model.
+    """
     ai = OpenAI(api_key=API_KEY, base_url=BASE_URL)
+    res = ai.embeddings.create(model=EMB_MODEL, input=text)
+    return [Vector(d.embedding) for d in res.data]
 
-    db = await asyncpg.connect(
-        user=DB_USER,
-        password=DB_PASS,
-        database=DB_NAME,
-        host=DB_ADDR,
-    )
 
-    try:
-        query = """
-        SELECT id, name, description FROM game
-        """
-
-        rows = await db.fetch(query)
-
-        texts = []
-        ids = []
-        for row in rows:
-            ids.append(row['id'])
-            texts.append(
-                f"name: {row['name']}; description: {row['description']};"
-            )
-
-        res = ai.embeddings.create(model=EMB_MODEL, input=texts)
-        vectors = [d.embedding for d in res.data]
-
-        updates = list(zip(ids, [str(vec) for vec in vectors]))
-
-        await db.executemany(
-            'UPDATE game SET embedding = $2::vector WHERE id = $1',
-            updates,
+async def make_embedding(game_id: int, pool):
+    """
+    full process of game description embedding: fetch data, embed and update
+    vector.
+    """
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT id, description from game WHERE id = $1",
+            game_id
         )
+        if not row:
+            return
 
-    finally:
-        await db.close()
+        vec = await embed(row['description'])
 
-asyncio.run(main())
+        await conn.execute(
+            'UPDATE game SET embedding = ($1) WHERE ID = $2',
+            vec[0],
+            game_id
+        )
+        print(f"embedding for game with {game_id} done")
