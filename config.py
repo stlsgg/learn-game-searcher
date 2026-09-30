@@ -6,12 +6,9 @@ from os import getenv
 
 load_dotenv()
 
-# open settings
-MODEL="qwen-local-4b:latest"
-EMB_MODEL="qwen-local-embedding:latest"
-BASE_URL="http://localhost:11434/v1"
-
-# sensitive settings
+MODEL=getenv("MODEL")
+EMB_MODEL=getenv("EMB_MODEL")
+BASE_URL=getenv("BASE_URL")
 API_KEY=getenv("API_KEY")
 DB_NAME=getenv("DB_NAME")
 DB_USER=getenv("DB_USER")
