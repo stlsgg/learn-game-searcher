@@ -1,13 +1,13 @@
-import asyncio
-from config import *
-from openai import OpenAI
-from fastapi import FastAPI, Request, status
-from objects import Question
 import asyncpg
-from contextlib import asynccontextmanager
-from helper import semantic_search
+import asyncio
 from pgvector.asyncpg import register_vector
+from openai import OpenAI
+from objects import Question
+from helper import semantic_search
+from fastapi import FastAPI, Request, status
 from embedding import embed, make_embedding
+from contextlib import asynccontextmanager
+from config import *
 
 # pgvector initialization
 async def init(conn):
