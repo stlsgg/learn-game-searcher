@@ -4,6 +4,24 @@ this code contains main logic. put here core tasks, functions and flows.
 import asyncpg
 from embedding import embed
 
+tools = [
+    {
+        "type": "function",
+        "name": "semantic_search",
+        "description": "get related information about games in json format by given short description using embeddings.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "short search text, game description, or genre, or keywords.",
+                },
+            },
+            "required": ["text"]
+        },
+    },
+]
+
 async def semantic_search(text: str, pool: asyncpg.Pool):
     """
     use embedding model to search through database games.
