@@ -7,7 +7,8 @@ this script is used for creating embeddings from data in the database.
 # keep ids for updates
 # use embedding model for generating 2000 dim vectors
 # NOTE: 2000 because of this - https://github.com/pgvector/pgvector#hnsw
-# NEW NOTE: 2048 because i don't care about first note.
+# NEW NOTE: 2048 because i don't understand and dont figure out yet that line
+# above.
 
 import asyncio
 import asyncpg
