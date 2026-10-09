@@ -102,7 +102,7 @@ async def create_embedding(id: int, request: Request):
         exists = await conn.fetchval("select 1 from game where id = $1", id)
         if not exists:
             raise HTTPException(
-                status_code=status.HTTP_404_BAD_REQUEST,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail={"status": "error", "message": "game doesnt exist"}
             )
 
