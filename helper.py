@@ -30,6 +30,6 @@ async def semantic_search(text: str, pool: asyncpg.Pool):
         emb = await embed(text)
         query = "SELECT id, name, description\
             FROM game\
-            ORDER BY embedding <-> $1 LIMIT 5"
+            ORDER BY embedding <=> $1 LIMIT 5"
         rows = await conn.fetch(query, emb[0])
         return rows
