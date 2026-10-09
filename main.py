@@ -106,7 +106,8 @@ async def create_embedding(id: int, request: Request):
                 detail={"status": "error", "message": "game doesnt exist"}
             )
 
-    asyncio.create_task(make_embedding(id, pool))
+    task = asyncio.create_task(make_embedding(id, pool))
+    await task
     return { "status": "ok", "message": "embedding started" }
 
 # general TODO:
