@@ -12,7 +12,7 @@ this script is used for creating embeddings from data in the database.
 
 import asyncio
 import asyncpg
-from openai import OpenAI
+from openai import AsyncOpenAI
 from config import *
 from pgvector import Vector
 
@@ -21,8 +21,8 @@ async def embed(text: str):
     """
     take string and convert to embedding data with ai model.
     """
-    ai = OpenAI(api_key=API_KEY, base_url=BASE_URL)
-    res = ai.embeddings.create(model=EMB_MODEL, input=text)
+    ai = AsyncOpenAI(api_key=API_KEY, base_url=BASE_URL)
+    res = await ai.embeddings.create(model=EMB_MODEL, input=text)
     return [Vector(d.embedding) for d in res.data]
 
 
