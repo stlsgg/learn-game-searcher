@@ -1,0 +1,30 @@
+services:
+  database:
+    image: pgvector/pgvector:pg18-trixie
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: games
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./table.sql:/docker-entrypoint-initdb.d/01_table.sql
+      - ./data.sql:/docker-entrypoint-initdb.d/02_data.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d games"]
+      interval: 2s
+      retries: 5
+  app:
+    build: .
+    env_file: .env
+    environment:
+      DB_HOST: database
+    depends_on:
+      database: {condition: service_healthy}
+    ports: ["8000:8000"]
+    volumes:
+      - ./:/app
+    command: uv run fastapi dev main.py --host 0.0.0.0
+
+volumes:
+  pgdata:
